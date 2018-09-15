@@ -22,7 +22,7 @@ def get_dash_usercontributed_docsets():
         key=lambda d: d['name'].lower()
     )
 
-    res = ['docsets:']
+    res = []
     for doc in docs:
         res.append('- title: %s' % doc['name'])
         res.append('  icon: %s' % doc.get('icon', doc.get('icon@2x', '""')))
@@ -36,7 +36,7 @@ def get_dash_docsets():
         key=lambda d: d['title'].lower()
     )
 
-    res = ['docsets:']
+    res = []
     for doc in docs:
         res.append('- title: %s' % doc['title'])
         res.append('  icon: %s' % doc['icon'])
