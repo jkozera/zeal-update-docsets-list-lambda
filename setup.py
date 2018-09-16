@@ -1,5 +1,5 @@
 import os
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="zevdocs-update-docsets-lambda",
@@ -9,6 +9,6 @@ setup(
     description=("An AWS Lambda utility to update ZevDocs docsets list"),
     license="MIT",
     url="https://zevdocs.io",
-    packages=['update_docsets'],
+    packages=find_packages(),
     install_requires=['boto3', 'paramiko', 'requests', 'dulwich'],
 )
