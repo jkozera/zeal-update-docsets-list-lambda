@@ -133,6 +133,8 @@ def process_repo(remote,
     if sum(1 for _ in repo.object_store.tree_changes(commits[1], commits[0])):
         porcelain.push('.', REMOTE % remote, [b'master:%s' % target_branch.encode('ascii')],
                        key_filename='/tmp/keyfile')
+    return cache
+
 
 def main(json_input=None, context=None):
     cache = process_repo('jkozera/zevdocs.io')
@@ -142,6 +144,7 @@ def main(json_input=None, context=None):
                  commit_message='chore(data): update docset list',
                  target_branch='master',
                  cache=cache)
+
 
 if __name__ == '__main__':
     main()
