@@ -1,16 +1,37 @@
 import base64
 import os
 import shutil
+import yaml
 
 import boto3
 import datetime
 from dulwich import client as _mod_client
 from dulwich import porcelain
 from dulwich.contrib.paramiko_vendor import ParamikoSSHVendor
+import png
 import requests
 
 from . import sparklines
 
+
+def is_png_equal(png1_b64, png2_b64):
+    if not png1_b64:
+        return False
+
+    images = []
+
+    for b64 in [png1_b64.encode('ascii'), png2_b64.encode('ascii')]:
+        reader = png.Reader(bytes=base64.b64decode(b64))
+        w, h, pxls, metadata = reader.read_flat()
+        images.append((w, h, list(pxls)))
+
+    return images[0] == images[1]
+
+
+def make_icons_cache(yamlfilename):
+    with open(yamlfilename, 'r') as raw:
+        contents = yaml.load(raw.read())
+    return {item['title']: item['icon'] for item in contents}
 
 
 _mod_client.get_ssh_vendor = ParamikoSSHVendor
@@ -18,7 +39,7 @@ DASH_USERCONTRIB_URL = 'https://london.kapeli.com/feeds/zzz/user_contributed/bui
 ZEAL_API_DOCSETS_URL = 'http://api.zealdocs.org/v1/docsets?filter[where][sourceId]=com.kapeli'
 
 
-def get_dash_usercontributed_docsets():
+def get_dash_usercontributed_docsets(old_icons):
     docs = sorted(
         requests.get(DASH_USERCONTRIB_URL).json()['docsets'].values(),
         key=lambda d: d['name'].lower()
@@ -26,13 +47,17 @@ def get_dash_usercontributed_docsets():
 
     res = []
     for doc in docs:
+        old_icon = old_icons[doc['name']]
+        icon = doc.get('icon', doc.get('icon@2x', '""'))
+        if old_icon != icon and is_png_equal(old_icon, icon):
+            icon = old_icon
         res.append('- title: %s' % doc['name'])
-        res.append('  icon: %s' % doc.get('icon', doc.get('icon@2x', '""')))
+        res.append('  icon: %s' % icon)
 
     return '\n'.join(res) + '\n'
 
 
-def get_dash_docsets():
+def get_dash_docsets(old_icons):
     docs = sorted(
         requests.get(ZEAL_API_DOCSETS_URL).json(),
         key=lambda d: d['title'].lower()
@@ -40,8 +65,12 @@ def get_dash_docsets():
 
     res = []
     for doc in docs:
+        old_icon = old_icons[doc['title']]
+        icon = doc['icon']
+        if old_icon != icon and is_png_equal(old_icon, icon):
+            icon = old_icon
         res.append('- title: %s' % doc['title'])
-        res.append('  icon: %s' % doc['icon'])
+        res.append('  icon: %s' % icon)
 
     return '\n'.join(res) + '\n'
 
@@ -92,13 +121,15 @@ def process_repo(remote,
         pass
 
     paths = ['_data/docsets.yml']
-    cache['docsets'] = cache.get('docsets') or get_dash_docsets()
-    with open('%s/_data/docsets.yml' % TARGET, 'w') as f:
+    filename = '%s/_data/docsets.yml' % TARGET
+    cache['docsets'] = cache.get('docsets') or get_dash_docsets(make_icons_cache(filename))
+    with open(filename, 'w') as f:
         f.write(cache['docsets'])
 
     if with_usercontrib:
-        usercontributed_docsets = get_dash_usercontributed_docsets()
-        with open('%s/_data/docsets_usercontributed.yml' % TARGET, 'w') as f:
+        filename = '%s/_data/docsets_usercontributed.yml' % TARGET
+        usercontributed_docsets = get_dash_usercontributed_docsets(make_icons_cache(filename))
+        with open(filename, 'w') as f:
             f.write(usercontributed_docsets)
         paths += ['_data/docsets_usercontributed.yml']
 

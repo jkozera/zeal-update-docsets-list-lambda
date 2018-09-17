@@ -10,5 +10,5 @@ setup(
     license="MIT",
     url="https://zevdocs.io",
     packages=find_packages(),
-    install_requires=['boto3', 'paramiko', 'requests', 'dulwich'],
+    install_requires=['boto3', 'paramiko', 'requests', 'dulwich', 'pypng', 'pyyaml'],
 )
