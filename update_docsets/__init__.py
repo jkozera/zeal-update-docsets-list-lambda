@@ -84,11 +84,12 @@ def data_uri(data):
 
 
 def get_daily_downloads(day):
+    empty = {'x86_64': [0, 0]}
     return sum([v[0] - v[1] for v in requests.get(
         'https://flathub.org/stats/%s/%02d/%02d.json' % (
             day.year, day.month, day.day
         )
-    ).json()["refs"]["io.github.jkozera.ZevDocs"].values()])
+    ).json()["refs"].get("io.github.jkozera.ZevDocs", empty).values()])
 
 
 def process_repo(remote,
