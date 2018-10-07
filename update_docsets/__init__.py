@@ -47,9 +47,9 @@ def get_dash_usercontributed_docsets(old_icons):
 
     res = []
     for doc in docs:
-        old_icon = old_icons[doc['name']]
+        old_icon = old_icons.get(doc['name'])
         icon = doc.get('icon', doc.get('icon@2x', '""'))
-        if old_icon != icon and is_png_equal(old_icon, icon):
+        if old_icon != icon and icon != '""' and is_png_equal(old_icon, icon):
             icon = old_icon
         res.append('- title: %s' % doc['name'])
         res.append('  icon: %s' % icon)
