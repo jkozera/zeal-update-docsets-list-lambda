@@ -65,7 +65,7 @@ def get_dash_docsets(old_icons):
 
     res = []
     for doc in docs:
-        old_icon = old_icons[doc['title']]
+        old_icon = old_icons.get(doc['title'])
         icon = doc['icon']
         if old_icon != icon and is_png_equal(old_icon, icon):
             icon = old_icon
