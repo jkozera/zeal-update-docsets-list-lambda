@@ -169,13 +169,11 @@ def process_repo(remote,
 
 
 def main(json_input=None, context=None):
-    cache = process_repo('jkozera/zevdocs.io')
     process_repo('zealdocs/zealdocs.github.io',
                  with_usercontrib=False,
                  with_downloads=False,
                  commit_message='chore(data): update docset list',
-                 target_branch='master',
-                 cache=cache)
+                 target_branch='master')
 
 
 if __name__ == '__main__':
