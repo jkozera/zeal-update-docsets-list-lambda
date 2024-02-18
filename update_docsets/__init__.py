@@ -155,7 +155,7 @@ def process_repo(remote,
 
     os.chdir(TARGET)
     porcelain.add(paths=paths)
-    jk = 'Jerzy Kozera <jerzy.kozera@gmail.com>'
+    jk = 'Jeremy Kozera <120114+jkozera@users.noreply.github.com>'
     porcelain.commit(
         message=commit_message or ("Update docset list and weekly downloads %s" % datetime.datetime.now().isoformat()),
         author=jk,
@@ -163,7 +163,7 @@ def process_repo(remote,
     )
     commits = [e.commit.tree for e in repo.get_walker(max_entries=2)][:2]
     if sum(1 for _ in repo.object_store.tree_changes(commits[1], commits[0])):
-        porcelain.push('.', REMOTE % remote, [b'master:%s' % target_branch.encode('ascii')],
+        porcelain.push('.', REMOTE % remote, [b'main:%s' % target_branch.encode('ascii')],
                        key_filename='/tmp/keyfile')
     return cache
 
@@ -173,7 +173,7 @@ def main(json_input=None, context=None):
                  with_usercontrib=False,
                  with_downloads=False,
                  commit_message='chore(data): update docset list',
-                 target_branch='master')
+                 target_branch='main')
 
 
 if __name__ == '__main__':
