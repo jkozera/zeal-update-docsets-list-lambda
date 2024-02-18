@@ -11,8 +11,6 @@ from dulwich.contrib.paramiko_vendor import ParamikoSSHVendor
 import png
 import requests
 
-from . import sparklines
-
 
 def is_png_equal(png1_b64, png2_b64):
     if not png1_b64:
@@ -94,7 +92,6 @@ def get_daily_downloads(day):
 
 def process_repo(remote,
                  with_usercontrib=True,
-                 with_downloads=True,
                  commit_message=None,
                  target_branch='gh-pages',
                  cache=None):
@@ -134,25 +131,6 @@ def process_repo(remote,
             f.write(usercontributed_docsets)
         paths += ['_data/docsets_usercontributed.yml']
 
-    if with_downloads:
-        with open('%s/_data/weekly_downloads.yml' % TARGET, 'w') as f:
-            today = datetime.date.today()
-            weekly_downloads = [
-                get_daily_downloads(today - datetime.timedelta(days=days))
-                for days in range(7, 0, -1)
-            ]
-            sparkline = data_uri(sparklines.impulse(
-                weekly_downloads,
-                below_color='yellow',
-                above_color='MediumSpringGreen',
-                width=3,
-                dmin=0,
-                dmax=max(weekly_downloads)
-            ))
-            f.write('count: %s\n' % sum(weekly_downloads))
-            f.write('sparkline: %s\n' % sparkline)
-        paths += ['_data/weekly_downloads.yml']
-
     os.chdir(TARGET)
     porcelain.add(paths=paths)
     jk = 'Jeremy Kozera <120114+jkozera@users.noreply.github.com>'
@@ -171,7 +149,6 @@ def process_repo(remote,
 def main(json_input=None, context=None):
     process_repo('zealdocs/zealdocs.github.io',
                  with_usercontrib=False,
-                 with_downloads=False,
                  commit_message='chore(data): update docset list',
                  target_branch='main')
 
