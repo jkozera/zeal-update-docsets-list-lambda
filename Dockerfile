@@ -1,4 +1,4 @@
-FROM python:3.6
+FROM python:3.12
 
 RUN mkdir /zevdocs-update-docsets-lambda && apt-get update && apt-get install -qy zip
 COPY update_docsets /zevdocs-update-docsets-lambda/update_docsets

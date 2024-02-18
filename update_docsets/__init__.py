@@ -30,7 +30,7 @@ def is_png_equal(png1_b64, png2_b64):
 
 def make_icons_cache(yamlfilename):
     with open(yamlfilename, 'r') as raw:
-        contents = yaml.load(raw.read())
+        contents = yaml.load(raw.read(), Loader=yaml.FullLoader)
     return {item['title']: item['icon'] for item in contents}
 
 
